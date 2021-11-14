@@ -24,13 +24,5 @@ public class BaseTest {
                 .post("/api/users");
 
     }
-//
-//    protected  createUser() {
-//        JSONObject requestParams = new JSONObject();
-//        requestParams.put("name", "morpheus");
-//        requestParams.put("job", "zion resident");
-//        return RestAssured.given(specification).contentType(ContentType.JSON).body(requestParams.toString())
-//                .post("/api/users");
-
-
+    
 }

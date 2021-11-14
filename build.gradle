@@ -18,6 +18,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.22'
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
     implementation group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0'
+    testImplementation 'com.codeborne:selenide:6.0.3'
+    implementation 'io.qameta.allure:allure-selenide:2.16.1'
 
 }
 
