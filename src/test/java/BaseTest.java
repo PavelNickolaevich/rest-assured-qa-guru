@@ -1,3 +1,4 @@
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -23,7 +24,7 @@ public class BaseTest {
         JSONObject requestParams = new JSONObject();
         requestParams.put("name", "morpheus");
         requestParams.put("job", "zion resident");
-        return RestAssured.given(specification).contentType(ContentType.JSON).body(requestParams.toString())
+        return RestAssured.given(specification).filter(new AllureRestAssured()).contentType(ContentType.JSON).body(requestParams.toString())
                 .post("/api/users");
     }
 

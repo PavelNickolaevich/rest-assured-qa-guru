@@ -1,3 +1,4 @@
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import net.minidev.json.JSONObject;
@@ -19,6 +20,7 @@ public class RequestReqresTests extends BaseTest {
 
         specification.pathParam("userId", 2);
         Response response = given(specification)
+                .filter(new AllureRestAssured())
                 .get("/api/users/{userId}")
                 .then()
                 .statusCode(200)
@@ -57,6 +59,7 @@ public class RequestReqresTests extends BaseTest {
         body.put("job", "zion resident");
 
         Response responseUpdate = RestAssured.given(specification)
+                .filter(new AllureRestAssured())
                 .contentType(JSON)
                 .body(body.toString())
                 .queryParam("userId", 2)
@@ -74,6 +77,7 @@ public class RequestReqresTests extends BaseTest {
     @Test
     void registerUnsuccessful() {
         given()
+                .filter(new AllureRestAssured())
                 .contentType(JSON)
                 .body("{\"email\": \"sydney@fife\"}")
                 .when()
@@ -86,6 +90,7 @@ public class RequestReqresTests extends BaseTest {
     @Test
     public void deleteUser() {
         given()
+                .filter(new AllureRestAssured())
                 .when()
                 .delete("https://reqres.in/api/users/2")
                 .then()

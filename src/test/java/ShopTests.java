@@ -1,4 +1,5 @@
 
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.http.Cookies;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
@@ -20,6 +21,7 @@ public class ShopTests {
         step("Get cookie by api and set it to browser", () -> {
             String body = String.format("//json");
             cookies = given()
+                    .filter(new AllureRestAssured())
                     .contentType("application/x-www-form-urlencoded; charset=UTF-8")
                     .formParam("Email", "qaguru@qa.guru")
                     .formParam("Password", "qaguru@qa.guru1")
@@ -32,6 +34,7 @@ public class ShopTests {
         });
         step("Add new product to basket", () -> {
             given()
+                    .filter(new AllureRestAssured())
                     .when()
                     .cookie(cookies.toString())
                     .post("http://demowebshop.tricentis.com/addproducttocart/catalog/31/1/1")
@@ -43,6 +46,7 @@ public class ShopTests {
 
         step("Add similar product to basket", () -> {
             given()
+                    .filter(new AllureRestAssured())
                     .when()
                     .cookie(cookies.toString())
                     .post("http://demowebshop.tricentis.com/addproducttocart/catalog/31/1/1")
@@ -54,6 +58,7 @@ public class ShopTests {
 
         step("Check cart", () -> {
             Response response = given()
+                    .filter(new AllureRestAssured())
                     .when()
                     .cookie(cookies.toString())
                     .get("http://demowebshop.tricentis.com/cart")
