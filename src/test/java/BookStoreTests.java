@@ -75,15 +75,16 @@ public class BookStoreTests {
                 .filter(new AllureRestAssured())
                 .contentType("application/json")
                 .accept("application/json")
-                .body(data.toString())
+                .body(data)
                 .when()
                 .log().uri()
                 .log().body()
                 .post("https://demoqa.com/Account/v1/GenerateToken")
                 .then()
                 .log().body()
-                .body("status", is("Success"))
-                .body("result", is("User authorized successfully."));
+                .statusCode(200);
+//                .body("status", is("Success"))
+//                .body("result", is("User authorized successfully."));
     }
 
     @Test
@@ -93,19 +94,19 @@ public class BookStoreTests {
                 "  \"password\": \"asdsad#frew_DFS2\"" +
                 "}";
         step("Generate token", () ->
-            given()
-                    .filter(customLogFilter().withCustomTemplates())
-                    .contentType("application/json")
-                    .accept("application/json")
-                    .body(data.toString())
-                    .when()
-                    .log().uri()
-                    .log().body()
-                    .post("https://demoqa.com/Account/v1/GenerateToken")
-                    .then()
-                    .log().body()
-                    .body("status", is("Success"))
-                    .body("result", is("User authorized successfully."))
+                given()
+                        .filter(customLogFilter().withCustomTemplates())
+                        .contentType("application/json")
+                        .accept("application/json")
+                        .body(data.toString())
+                        .when()
+                        .log().uri()
+                        .log().body()
+                        .post("https://demoqa.com/Account/v1/GenerateToken")
+                        .then()
+                        .log().body()
+                        .body("status", is("Success"))
+                        .body("result", is("User authorized successfully."))
         );
         step("Any UI action");
     }
