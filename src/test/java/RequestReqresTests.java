@@ -37,6 +37,7 @@ public class RequestReqresTests extends BaseTest {
     @Test
     public void postCreateUser() {
 
+        setUp();
         Response response = createUser();
         response.then()
                 .contentType(JSON)
@@ -50,13 +51,15 @@ public class RequestReqresTests extends BaseTest {
 
     @Test
     public void putUpdateUser() {
-        specification.pathParam("userId", 2);
+
         JSONObject body = new JSONObject();
         body.put("name", "morpheus");
         body.put("job", "zion resident");
+
         Response responseUpdate = RestAssured.given(specification)
                 .contentType(JSON)
                 .body(body.toString())
+                .queryParam("userId", 2)
                 .put("/api/users/{userId}")
                 .then().statusCode(200).extract()
                 .response();

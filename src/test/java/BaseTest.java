@@ -4,15 +4,18 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import net.minidev.json.JSONObject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 
 public class BaseTest {
 
     protected static RequestSpecification specification;
+    private final static String BASEURL = ("https://reqres.in");
 
     @BeforeAll
     static void setUp() {
-        specification = new RequestSpecBuilder().setBaseUri("https://reqres.in").build();
+        specification = new RequestSpecBuilder().setBaseUri(BASEURL).build();
 
     }
 
@@ -22,7 +25,6 @@ public class BaseTest {
         requestParams.put("job", "zion resident");
         return RestAssured.given(specification).contentType(ContentType.JSON).body(requestParams.toString())
                 .post("/api/users");
-
     }
-    
+
 }

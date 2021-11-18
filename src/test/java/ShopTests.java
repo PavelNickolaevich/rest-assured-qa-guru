@@ -14,7 +14,7 @@ public class ShopTests {
 
     @Test
     @Tag("demowebshop")
-    @Disabled("Example test code for further test development")
+//    @Disabled("Example test code for further test development")
     @DisplayName("Successful authorization to some demowebshop , adding two products and chek basket")
     void addToCartAndCheckBasket() {
         step("Get cookie by api and set it to browser", () -> {
