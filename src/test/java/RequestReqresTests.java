@@ -2,54 +2,81 @@ import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import net.minidev.json.JSONObject;
+import objects.AllData;
+import objects.User;
+import objects.UserData;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RequestReqresTests extends BaseTest {
 
 
     @Test
-    public void getListUsers() {
+    public void getSingleUsers() {
 
-        specification.pathParam("userId", 2);
-        Response response = given(specification)
-                .filter(new AllureRestAssured())
+        requestSpec.pathParam("userId", 2);
+        AllData dataUser = given(requestSpec)
                 .get("/api/users/{userId}")
                 .then()
-                .statusCode(200)
-                .contentType(JSON).extract().response();
-        assertEquals(response.path("data.id").toString(), "2");
-        assertEquals(response.path("data.email"), "janet.weaver@reqres.in");
-        assertEquals(response.path("data.first_name"), "Janet");
-        assertEquals(response.path("data.last_name"), "Weaver");
-        assertEquals(response.path("data.avatar"), "https://reqres.in/img/faces/2-image.jpg");
-        assertEquals(response.path("support.url"), "https://reqres.in/#support-heading");
-        assertEquals(response.path("support.text"), "To keep ReqRes free, contributions towards server costs are appreciated!");
-        response.print();
+                .spec(responseSpec)
+                .log().body()
+                .extract()
+                .as(AllData.class);
 
+        assertEquals(2, dataUser.getData().getId());
+        assertEquals("janet.weaver@reqres.in", dataUser.getData().getEmail());
+        assertEquals("Janet", dataUser.getData().getFirstName());
+        assertEquals("Weaver", dataUser.getData().getLastName());
+        assertEquals("https://reqres.in/img/faces/2-image.jpg", dataUser.getData().getAvatar());
+        assertEquals("https://reqres.in/#support-heading", dataUser.getSupport().getUrl());
+        assertEquals("To keep ReqRes free, contributions towards server costs are appreciated!", dataUser.getSupport().getText());
+    }
+
+
+    @Test
+    @Tag("groovy")
+    public void getListUsersWithGroovy() {
+        given(requestSpec)
+                .param("page", 2)
+                .get("/api/users")
+                .then()
+                .spec(responseSpec)
+                .log().body().
+                body(
+                        "page", is(2),
+                        "data.size()", is(6),
+                        "data.findAll { it.avatar.startsWith('https://reqres.in/img/faces/') }.size()", is(6),
+                        "data.findAll { it.email =~/.*?@reqres.in/ }.email.flatten()", hasItems("michael.lawson@reqres.in", "rachel.howell@reqres.in")
+                );
     }
 
     @Test
     public void postCreateUser() {
 
         setUp();
+
         Response response = createUser();
-        response.then()
+        User user = response.then()
                 .contentType(JSON)
                 .statusCode(201)
-                .body("name", is("morpheus")
-                        , "job", is("zion resident")
-                        , "id", is(notNullValue())
-                        , "createdAt", is(notNullValue()));
-        response.print();
+                .log().body()
+                .extract()
+                .as(User.class);
+
+        assertEquals("morpheus", user.getName());
+        assertEquals("zion resident", user.getJob());
+        assertTrue(user.getId() > 0);
+        assertTrue(user.getTimeCreated().getTime() > 0);
     }
+
 
     @Test
     public void putUpdateUser() {
@@ -58,41 +85,51 @@ public class RequestReqresTests extends BaseTest {
         body.put("name", "morpheus");
         body.put("job", "zion resident");
 
-        Response responseUpdate = RestAssured.given(specification)
-                .filter(new AllureRestAssured())
-                .contentType(JSON)
+        User user = RestAssured.given(requestSpec)
                 .body(body.toString())
-                .queryParam("userId", 2)
+                .pathParam("userId", 2)
                 .put("/api/users/{userId}")
-                .then().statusCode(200).extract()
-                .response();
+                .then()
+                .spec(responseSpec)
+                .log().body()
+                .extract().as(User.class);
 
-        assertEquals(responseUpdate.path("name"), "morpheus");
-        assertEquals(responseUpdate.path("job"), "zion resident");
-        Assertions.assertNotNull(responseUpdate.path("updatedAt"));
-        responseUpdate.print();
+        assertEquals("morpheus", user.getName());
+        assertEquals("zion resident", user.getJob());
+        Assertions.assertNotNull(user.getTimeUpdated());
 
     }
 
     @Test
     void registerUnsuccessful() {
-        given()
-                .filter(new AllureRestAssured())
-                .contentType(JSON)
-                .body("{\"email\": \"sydney@fife\"}")
-                .when()
-                .post(("https://reqres.in/api/register"))
+
+        setUp();
+
+        JSONObject body = new JSONObject();
+        body.put("email", "sydney@fife");
+
+        Response response = given(requestSpec)
+                .body(body.toString())
+                .post("/api/register")
                 .then()
                 .statusCode(400)
-                .body("error", is("Missing password"));
+                .log().body().extract().response();
+
+        assertTrue(response.path("error").equals("Missing password"));
+
+        //.body("error", hasItem("Missing password"));
+        // .body("error", is("Missing password"));
+//        body("data.findAll{it.email =~/.*?@reqres.in/}.email.flatten()",
+//                hasItem("eve.holt@reqres.in"));
     }
 
     @Test
     public void deleteUser() {
-        given()
+        requestSpec.pathParam("userId", 2);
+        given(requestSpec)
                 .filter(new AllureRestAssured())
                 .when()
-                .delete("https://reqres.in/api/users/2")
+                .delete("/api/users/{userId}")
                 .then()
                 .statusCode(204);
     }

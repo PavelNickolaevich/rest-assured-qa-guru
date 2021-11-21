@@ -41,6 +41,7 @@ public class ShopTests {
                     .post("http://demowebshop.tricentis.com/addproducttocart/catalog/31/1/1")
                     .then()
                     .statusCode(200)
+                    .log().body()
                     .body("success", is(true),
                             "updatetopcartsectionhtml", is("(1)"));
         });
@@ -53,6 +54,7 @@ public class ShopTests {
                     .post("http://demowebshop.tricentis.com/addproducttocart/catalog/31/1/1")
                     .then()
                     .statusCode(200)
+                    .log().body()
                     .body("success", is(true),
                             "updatetopcartsectionhtml", is("(2)"));
         });
